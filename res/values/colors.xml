@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="squints_yellow">#ffFAEE05</color>
-    <color name="squints_blue">#ff33b5e5</color>
+    <color name="cryptoGlance_lightgrey">#ff909090</color>
+    <color name="cryptoGlance_darkgrey">#ff444444</color>
+    <color name="cryptoGlance_yellow">#ffFAEE05</color>
+    <color name="cryptoGlance_blue">#ff33b5e5</color>
 </resources>

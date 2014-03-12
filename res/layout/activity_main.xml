@@ -3,14 +3,14 @@
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 android:gravity="fill"
-android:id="@+id/squintsWebview"
+android:id="@+id/cryptoGlanceWebview"
 android:background="#ff282828"
 >
     <ImageView
         android:layout_height="fill_parent"
         android:layout_width="fill_parent"
         android:gravity="center"
-        android:src="@drawable/squints_logo_large" />
+        android:src="@drawable/cryptoglance_logo_large" />
         
     <ProgressBar
      
