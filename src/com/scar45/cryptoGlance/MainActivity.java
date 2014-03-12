@@ -42,12 +42,12 @@ public class MainActivity extends Activity {
     ProgressBar loadingProgressBar,loadingTitle;
 
     String urlUsercryptoGlance = "";
-    String urlcryptoGlance = "http://rigwat.ch/";
-    String urlSubreddit = "http://reddit.com/r/rigwatch";
+    String urlcryptoGlance = "http://cryptoglance.info";
+    String urlSubreddit = "http://reddit.com/r/cryptoglance";
     String urlGooglePlus = "https://plus.google.com/u/0/b/110896112995796953409/110896112995796953409/posts";
     String urlGooglePlusCommunity = "https://plus.google.com/u/0/b/110896112995796953409/communities/111042089628113521779";
-    String urlTwitter = "http://twitter.com/cryptoGlanceapp";
-    String urlGithub = "https://github.com/cryptoGlance/cryptoGlance-webviewer";
+    String urlTwitter = "http://twitter.com/cryptoGlance";
+    String urlGithub = "https://github.com/cryptoGlance";
 
 
 
