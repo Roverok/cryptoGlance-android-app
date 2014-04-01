@@ -11,6 +11,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.BaseMovementMethod;
 import android.text.method.ScrollingMovementMethod;
@@ -41,7 +43,9 @@ public class MainActivity extends Activity {
 
     ProgressBar loadingProgressBar,loadingTitle;
 
-    String urlUsercryptoGlance = "";
+    // TODO: Send login credentials, but MUST be secured first!
+    // String urlUsercryptoGlance = "";
+
     String urlcryptoGlance = "http://cryptoglance.info";
     String urlSubreddit = "http://reddit.com/r/cryptoglance";
     String urlGooglePlus = "https://plus.google.com/u/0/b/110896112995796953409/110896112995796953409/posts";
@@ -49,13 +53,38 @@ public class MainActivity extends Activity {
     String urlTwitter = "http://twitter.com/cryptoGlance";
     String urlGithub = "https://github.com/cryptoGlance";
 
+    protected void checkPrefs() {
 
-
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String urlUsercryptoGlance = sharedPrefs.getString("cg_url", "");
+        boolean urlUseHTTPS = sharedPrefs.getBoolean("use_https", false);
+		
+        // Check the status of preferences, and either load App Settings if empty, or load the user-defined URL of cryptoGlance
+        
+        if (urlUsercryptoGlance != null && !urlUsercryptoGlance.isEmpty()) {
+            if (urlUseHTTPS == true) {
+                Toast.makeText(getApplicationContext(),
+                "Loading '" + urlUsercryptoGlance + "' using secure HTTPS",
+                Toast.LENGTH_LONG).show();
+                webView.loadUrl("https://" + urlUsercryptoGlance);
+            } else {
+                Toast.makeText(getApplicationContext(),
+                "Loading '" + urlUsercryptoGlance + "' using normal HTTP",
+                Toast.LENGTH_LONG).show();
+                webView.loadUrl("http://" + urlUsercryptoGlance);                
+            }
+        } else {
+            Toast.makeText(getApplicationContext(),
+            "cryptoGlance URL is not defined! Please check the App Settings.",
+            Toast.LENGTH_LONG).show();            
+        }
+        
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.state_preserving_impl);
 
 		// Initialize the UI
@@ -66,8 +95,8 @@ public class MainActivity extends Activity {
 	{
 		// Retrieve UI elements
 		webViewPlaceholder = ((FrameLayout)findViewById(R.id.webViewPlaceholder));
-	
-		// Initialize the WebView if necessary
+        
+        // Initialize the WebView if necessary
 		if (cryptoGlanceWebview == null)
 		{
 			// Create the webview
@@ -133,59 +162,38 @@ public class MainActivity extends Activity {
                 @Override
                 public void onPageFinished(WebView view, String url) 
                 {
-                    String command = "javascript:hideMobileHeader();";
+                    String command = "javascript:fixApp();";
                     view.loadUrl(command);       
                 }
     
     	        });
 	        
-			// Load the first page
-			//webView.loadUrl(urlcryptoGlance);
-            String box = dialogBoxStart();
-            this.urlUsercryptoGlance = box;
+            onResume();
+            
 		}
 		parentViewGroup.removeView(cryptoGlanceWebview);
 		// Attach the WebView to its placeholder
 		parentViewGroup.addView(cryptoGlanceWebview);
 	}
-    
-    public String dialogBoxStart() 
-    {
-        String returned = "";
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("cryptoGlance App Settings");
-        alert.setMessage("IP address or hostname of your cryptoGlance installation WITHOUT http://");
+        
+    @Override
+    protected void onResume() {
+        super.onResume();
+        
+        final String PREFS_NAME = "FirstRunCheck";
+        SharedPreferences firstrun = getSharedPreferences(PREFS_NAME, 0);
+        if (firstrun.getBoolean("first_time_run", true)) {
+            Toast.makeText(getApplicationContext(),
+            "This is your first time running cryptoGlance. Please set the location of your cryptoGlance instance.",
+            Toast.LENGTH_LONG).show();
+            
+            startActivity(new Intent(this, ShowSettingsActivity.class));
 
-        // Set an EditText view to get user input
-        final EditText inputcryptoGlanceURL = new EditText(this);
-        alert.setView(inputcryptoGlanceURL);
-
-        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() 
-        {
-                public void onClick(DialogInterface dialog, int whichButton) 
-                {
-                    urlUsercryptoGlance = inputcryptoGlanceURL.getText().toString();
-                    webView.loadUrl("http://" + urlUsercryptoGlance);
-                    Toast.makeText(getApplicationContext(),
-                    "Loading cryptoGlance @ http://" + urlUsercryptoGlance,
-                    Toast.LENGTH_SHORT).show();
-                }
-        };
-
-        alert.setPositiveButton("OK", listener);
-
-        alert.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // Canceled.
-                    }
-                });
-        returned =  inputcryptoGlanceURL.getText().toString();
-        alert.show();
-        return returned;
-
+            firstrun.edit().putBoolean("first_time_run", false).commit(); 
+        } else {
+            checkPrefs();
+        }
     }
-    
     
 	@Override
 	public void onConfigurationChanged(Configuration newConfig)
@@ -221,6 +229,7 @@ public class MainActivity extends Activity {
 
 		// Restore the state of the WebView
 		webView.restoreState(savedInstanceState);
+        
 	}
     
     @Override
@@ -242,15 +251,13 @@ public class MainActivity extends Activity {
                 break;
 
             case R.id.action_appsettings:
-                String box = dialogBoxStart();
-                this.urlUsercryptoGlance = box;
-                break;
+    			startActivity(new Intent(this, ShowSettingsActivity.class));
+    			return true;
 
             case R.id.action_reload:
-                Toast.makeText(getApplicationContext(),
-                "Refreshing cryptoGlance...",
-                Toast.LENGTH_LONG).show();
-                webView.reload();
+                checkPrefs();          
+
+                //webView.reload();
                 break;
 
             case R.id.action_exit:
@@ -273,9 +280,9 @@ public class MainActivity extends Activity {
 
     public void onBackPressed (){
         if (webView.isFocused() && webView.canGoBack()) {
-                webView.goBack();       
-        }else {
-                MainActivity.this.finish();
+            webView.goBack();       
+        } else {
+            MainActivity.this.finish();
         }
     }
     

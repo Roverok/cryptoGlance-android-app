@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<PreferenceCategory 
+		android:title="App Settings"
+		android:key="cg_app_settings">
+
+		<EditTextPreference
+			android:key="cg_url"
+            android:inputType="textUri"
+			android:title="cryptoGlance URL"
+			android:summary="Define where your cryptoGlance instance is located"
+			android:dialogTitle="cryptoGlance URL"
+			android:dialogMessage="Enter the URL where cryptoGlance is running.\n\nPlease do NOT use the http(s):// prefix:"	
+			android:defaultValue=""
+        />
+
+        <CheckBoxPreference
+            android:key="use_https"
+            android:summary="Toggle whether to use a secure pipe (this will only take effect if your server is listening on HTTPS properly)"
+            android:title="Enable HTTPS"
+            android:defaultValue="false"
+        />
+
+	</PreferenceCategory>
+	
+</PreferenceScreen>
